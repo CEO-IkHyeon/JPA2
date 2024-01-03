@@ -29,7 +29,7 @@ public class MemberService {
     }
 
     /**
-     * 중복 회원 검증 로직
+     * 중복 회원 검증(이름으로) 로직
      * */
     
     private void validateDuplicateMember(Member member) {
