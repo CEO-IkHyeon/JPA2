@@ -12,8 +12,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
@@ -37,11 +35,10 @@ public class OrderService {
 
         //배송정보 생성
         Delivery delivery = new Delivery();
-        delivery.setAddress(findMember.getAddress());
+        delivery.setAddress(findMember.getAddress());   //단순화하기 위해 그냥 바로 member의 address 가져온 것
 
         //주문 상품 생성
         OrderItem orderItem = OrderItem.createOrderItem(findItem, findItem.getPrice(), count);
-
 
         //주문 생성
         Order order = Order.createOrder(findMember, delivery, orderItem);
@@ -66,7 +63,7 @@ public class OrderService {
         //주문 엔티티 조회
         Order order = orderRepository.findOne(orderId);
         //주문 취소
-        order.cancle(); // 엔티티의 비지니스 로직들이 실행함 -> 엔티티 수정으로 JPA가 알아서 각 수정된 table에 update query 날려준다
+        order.cancel(); // 엔티티의 비지니스 로직들이 실행함 -> 엔티티 수정으로 JPA가 알아서 각 수정된 table에 update query 날려준다
     }
 
     // 검색

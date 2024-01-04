@@ -36,7 +36,7 @@ public class OrderItem {
 //    }
 
     //==생성 메서드==//
-    // Order는 세팅안함. Order에서 addOrderItem() 호출시 order에 값 넣어준다
+    // Order는 세팅안함. createOrder() 생성 메서드에서 addOrderItem() 호출시 order에 값 넣어준다
     public static OrderItem createOrderItem(Item item, int orderPrice, int count) {
         OrderItem orderItem = new OrderItem();
         orderItem.setItem(item);
