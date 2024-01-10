@@ -52,4 +52,14 @@ public class MemberService {
     public Member findOne(Long memberId) {
         return memberRepository.findOne(memberId);
     }
+
+    @Transactional
+    public void update(Long id, String name) {
+        // @Transactional -> 트랜잭션이 있는 상태에서 조회하면 영속성 컨텍스트에 있는 애들 가져온다
+                // jpa가 id에 해당하는 member 찾아옴 -> 영속성 컨텍스트 올리고 그걸 반환 -> member는 영속상태
+        // 그 상태에서 영속 상태인 member를 수정하고 @transactional에 의해서 끝나는 시점에 트랜잭션 커밋된다
+        // 그 때 JPA가 flush(dirty checking) -> 알아서 update query를 DB에 날려줌
+        Member member = memberRepository.findOne(id);
+        member.setName(name);
+    }
 }
