@@ -91,6 +91,42 @@ public class OrderRepository {
     }
 
     /**
+     * V3에서 사용
+     * V4보다 범용성 좋다
+     * @return
+     */
+    public List<Order> findAllWithMemberDelivery() {
+        return em.createQuery(
+                "select o from Order o" +
+                        " join fetch o.member m" +
+                        " join fetch o.delivery d", Order.class
+        ).getResultList();  // order 가져올 때 한번에 member와 delivery를 join해서 가져오자 (fetch는 JPA 문법)
+    }
+
+    /**
+     * repo에서 controller에 의존관계가 생기면 안되기에 Simple..DTO를 따로 repo package에 선언
+     * 단점
+     *      1. 딱 OrderSimpleQueryDto에 fit하게 만들었기에 이 용도 외에는 재사용 불가능
+     *      2. 사실상 API 스펙이 이 쿼리에 들어와 있음 = API스펙에 맞춰서 repository 코드가 짜진 거다
+     * 장점 :필요한 필드만 딱딱 select 해오기에 v3보다 조금 성능 최적화 가능
+     */
+    public List<OrderSimpleQueryDto> findOrderDtos() {
+        return em.createQuery(
+                "select new jpabook.jpashop.repository.OrderSimpleQueryDto(o.id, m.name, o.orderDate, o.status, d.address) " +
+                        " from Order o" +
+                        " join o.member m" +
+                        " join o.delivery d", OrderSimpleQueryDto.class)
+                .getResultList();
+    }
+
+    /**
+     entity나 value object(Embeddable)만 JPA가 기본적으로 반환 
+     * DTO 같은건 자동 반환 안되니까 "new" operation 활용해야함
+     */
+    
+
+
+    /**
      * Query DSL로 처리
      */
 //    public List<Order> findAll(OrderSearch orderSearch) {
