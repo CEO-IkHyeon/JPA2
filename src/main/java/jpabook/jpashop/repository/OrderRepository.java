@@ -123,6 +123,16 @@ public class OrderRepository {
      entity나 value object(Embeddable)만 JPA가 기본적으로 반환 
      * DTO 같은건 자동 반환 안되니까 "new" operation 활용해야함
      */
+
+    public List<Order> findAllMemberDeliveryOrderItem() {
+        return em.createQuery(
+                "select o from Order o" +
+                        " join fetch o.member m" +
+                        " join fetch o.delivery d" +
+                        " join fetch o.orderItems i", Order.class
+        ).getResultList();
+    }
+
     
 
 
