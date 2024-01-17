@@ -110,19 +110,33 @@ public class OrderRepository {
      *      2. 사실상 API 스펙이 이 쿼리에 들어와 있음 = API스펙에 맞춰서 repository 코드가 짜진 거다
      * 장점 :필요한 필드만 딱딱 select 해오기에 v3보다 조금 성능 최적화 가능
      */
-    public List<OrderSimpleQueryDto> findOrderDtos() {
-        return em.createQuery(
-                "select new jpabook.jpashop.repository.OrderSimpleQueryDto(o.id, m.name, o.orderDate, o.status, d.address) " +
-                        " from Order o" +
-                        " join o.member m" +
-                        " join o.delivery d", OrderSimpleQueryDto.class)
-                .getResultList();
-    }
+//    public List<OrderSimpleQueryDto> findOrderDtos() {
+//        return em.createQuery(
+//                "select new jpabook.jpashop.repository.order.simplequery.OrderSimpleQueryDto(o.id, m.name, o.orderDate, o.status, d.address) " +
+//                        " from Order o" +
+//                        " join o.member m" +
+//                        " join o.delivery d", OrderSimpleQueryDto.class)
+//                .getResultList();
+//    }
+    // -> OrderSimpleQueryRepository로 옮기자
 
     /**
      entity나 value object(Embeddable)만 JPA가 기본적으로 반환 
      * DTO 같은건 자동 반환 안되니까 "new" operation 활용해야함
      */
+
+
+    /**
+     * repository는 순수하게 entity 조회하는 용도로만 사용하자
+     * -> DTO를 repo에서 조회하는건 api 스펙이 사실상 findOrderDtos() 메소드에 들어와 있는 것과 똑같음
+     * 그럼 어떻게 해?
+     * 성능 최적화를 위한 쿼리용 repo를 뽑자-> repo 밑에 따로 package 만들자
+     * 왜 이렇게 하느냐?
+     *      * findAllWithMemberDelivery() -> Order 엔티티를 그냥 fetch join으로만 가져오니까 재사용 가능
+     *      * findOrderDtos() -> 딱 API 스펙이 박혀있으니 재사용성 매우 낮음
+     */
+
+
 
     public List<Order> findAllMemberDeliveryOrderItem() {
         return em.createQuery(
@@ -132,9 +146,6 @@ public class OrderRepository {
                         " join fetch o.orderItems i", Order.class
         ).getResultList();
     }
-
-    
-
 
     /**
      * Query DSL로 처리
