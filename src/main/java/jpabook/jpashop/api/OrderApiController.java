@@ -6,12 +6,10 @@ import jpabook.jpashop.domain.OrderItem;
 import jpabook.jpashop.domain.OrderStatus;
 import jpabook.jpashop.repository.OrderRepository;
 import jpabook.jpashop.repository.OrderSearch;
-import lombok.Data;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.aspectj.weaver.ast.Or;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
@@ -92,7 +90,27 @@ public class OrderApiController {
 
     @GetMapping("/api/v3/orders")
     public List<OrderDto> ordersV3() {
-        List<Order> orders = orderRepository.findAllMemberDeliveryOrderItem();
+        List<Order> orders = orderRepository.findAllWithItem();
+
+        for (Order order: orders) {
+            System.out.println("order ref = " + order + " id = " + order.getId());
+        }
+
+        List<OrderDto> collect = orders.stream()
+                .map(order -> new OrderDto(order))
+                .collect(Collectors.toList());
+
+        return collect;
+    }
+
+    @GetMapping("/api/v3.1/orders")
+    public List<OrderDto> ordersV3_page(
+            @RequestParam(value = "offset", defaultValue = "0") int offset,
+            @RequestParam(value = "limit", defaultValue = "100") int limit)
+    {
+        // 1. Order를 기준으로 ToOne 관계는 한번에 fetch join으로 가져오기 (아직 OrderItems는 해결 X)
+        List<Order> orders = orderRepository.findAllWithMemberDelivery(offset, limit);
+
         List<OrderDto> collect = orders.stream()
                 .map(order -> new OrderDto(order))
                 .collect(Collectors.toList());

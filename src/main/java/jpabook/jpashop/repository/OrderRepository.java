@@ -103,6 +103,8 @@ public class OrderRepository {
         ).getResultList();  // order 가져올 때 한번에 member와 delivery를 join해서 가져오자 (fetch는 JPA 문법)
     }
 
+
+
     /**
      * repo에서 controller에 의존관계가 생기면 안되기에 Simple..DTO를 따로 repo package에 선언
      * 단점
@@ -138,14 +140,31 @@ public class OrderRepository {
 
 
 
-    public List<Order> findAllMemberDeliveryOrderItem() {
+    public List<Order> findAllWithItem() {
+        return em.createQuery(
+                "select distinct o from Order o" +
+                        " join fetch o.member m" +
+                        " join fetch o.delivery d" +
+                        " join fetch o.orderItems oi" +
+                        " join fetch oi.item i", Order.class
+        ).getResultList();
+    }
+
+    public List<Order> findAllWithMemberDelivery(int offset, int limit) {
         return em.createQuery(
                 "select o from Order o" +
                         " join fetch o.member m" +
-                        " join fetch o.delivery d" +
-                        " join fetch o.orderItems i", Order.class
-        ).getResultList();
+                        " join fetch o.delivery d", Order.class)
+                .setFirstResult(offset)
+                .setMaxResults(limit)
+                .getResultList();
     }
+
+    /**
+     * distinct의 2가지 기능
+     * 1. db query에 distinct 포함되어서 날라감
+     * 2. root entity(=Order)가 중복인 경우에 그 중복을 걸러서 collection에 담아준다
+     */
 
     /**
      * Query DSL로 처리
